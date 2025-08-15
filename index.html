@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica Turni</title>
+    <!-- Carica il framework Tailwind CSS per uno stile moderno e reattivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Contenitore principale dell'app -->
+    <div class="bg-white p-6 rounded-3xl shadow-2xl w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Verificatore Turni Notturni</h1>
+
+        <!-- Sezione per l'inserimento dei turni -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Inserisci i tuoi turni (fino a 7 giorni):</h2>
+            <div id="shiftInputs" class="flex flex-col gap-4">
+                <!-- I campi di input verranno generati dinamicamente qui -->
+            </div>
+        </div>
+
+        <!-- Pulsanti di verifica e cancellazione, area per il risultato -->
+        <div class="flex flex-col gap-4">
+            <button id="verifyBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl text-lg shadow-lg transition-colors w-full">Verifica Turni</button>
+            <div id="resultBox" class="text-center font-bold text-lg p-4 rounded-xl transition-all duration-300 transform scale-0 opacity-0">
+                <!-- Il risultato apparirà qui -->
+            </div>
+            <button id="clearBtn" class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-colors w-full mt-2">Cancella Tutto</button>
+        </div>
+    </div>
+
+    <script>
+        const verifyBtn = document.getElementById('verifyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const shiftInputsContainer = document.getElementById('shiftInputs');
+        const resultBox = document.getElementById('resultBox');
+
+        // Genera 7 gruppi di campi di input per i turni
+        for (let i = 1; i <= 7; i++) {
+            const container = document.createElement('div');
+            container.id = `day-container-${i}`; 
+            container.className = 'bg-gray-50 p-4 rounded-xl shadow-inner grid grid-cols-1 sm:grid-cols-2 gap-4';
+            
+            // Titolo per il giorno
+            const dayTitle = document.createElement('h3');
+            dayTitle.className = 'col-span-1 sm:col-span-2 text-md font-semibold text-gray-700';
+            dayTitle.textContent = `Giorno ${i}:`;
+            container.appendChild(dayTitle);
+
+            // Input per l'orario previsto
+            const plannedGroup = document.createElement('div');
+            plannedGroup.className = 'flex flex-col';
+            const plannedLabel = document.createElement('label');
+            plannedLabel.className = 'text-gray-700 font-medium mb-1 text-sm';
+            plannedLabel.textContent = `Orario Previsto`;
+            const plannedInput = document.createElement('input');
+            plannedInput.type = 'time';
+            plannedInput.id = `planned-shift-${i}`;
+            plannedInput.className = 'p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
+            plannedGroup.appendChild(plannedLabel);
+            plannedGroup.appendChild(plannedInput);
+            container.appendChild(plannedGroup);
+
+            // Input per l'orario ritardato (opzionale)
+            const delayedGroup = document.createElement('div');
+            delayedGroup.className = 'flex flex-col';
+            const delayedLabel = document.createElement('label');
+            delayedLabel.className = 'text-gray-700 font-medium mb-1 text-sm';
+            delayedLabel.textContent = `Orario Ritardato (Opzionale)`;
+            const delayedInput = document.createElement('input');
+            delayedInput.type = 'time';
+            delayedInput.id = `delayed-shift-${i}`;
+            delayedInput.className = 'p-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
+            delayedGroup.appendChild(delayedLabel);
+            delayedGroup.appendChild(delayedInput);
+            container.appendChild(delayedGroup);
+
+            shiftInputsContainer.appendChild(container);
+        }
+
+        // Funzione per convertire un orario 'HH:mm' in minuti totali
+        const timeToMinutes = (time) => {
+            if (!time) return null;
+            const [hours, minutes] = time.split(':').map(Number);
+            return (hours * 60) + minutes;
+        };
+
+        // Funzione per verificare se un orario è un "Night Finish"
+        // La definizione di "Night Finish" rimane invariata: 02:00 - 04:59.
+        const isNightFinish = (time) => {
+            if (!time) return false;
+            const minutes = timeToMinutes(time);
+            const startNF = timeToMinutes('02:00');
+            const endNF = timeToMinutes('04:59');
+            return minutes >= startNF && minutes <= endNF;
+        };
+
+        // Funzione per verificare i "disruptive duties"
+        // Corretto: I turni "disruptive" sono quelli che terminano tra le 01:00 e le 06:59
+        const isDisruptiveDuty = (time) => {
+            if (!time) return false;
+            const minutes = timeToMinutes(time);
+            const startDD = timeToMinutes('01:00');
+            const endDD = timeToMinutes('06:59');
+            return minutes >= startDD && minutes <= endDD;
+        };
+
+        // Funzione per ottenere l'orario finale di un giorno (ritardato se presente)
+        const getFinalShiftTime = (dayIndex) => {
+            const delayedInput = document.getElementById(`delayed-shift-${dayIndex}`);
+            const plannedInput = document.getElementById(`planned-shift-${dayIndex}`);
+            return delayedInput.value || plannedInput.value;
+        };
+        
+        // Funzione di verifica principale basata sulle regole fornite
+        const checkShifts = () => {
+            const shifts = Array.from({length: 7}, (_, i) => getFinalShiftTime(i + 1))
+                .filter(time => time !== '');
+            
+            if (shifts.length < 1) {
+                updateResult('legal', 'Inserisci almeno un turno per la verifica.');
+                return;
+            }
+
+            // Verifica delle regole sui "Night Finish" (MODALITÀ 1)
+            let nightFinishBlocks = [];
+            let currentNFBlockStart = -1;
+
+            for (let i = 0; i < shifts.length; i++) {
+                if (isNightFinish(shifts[i])) {
+                    if (currentNFBlockStart === -1) {
+                        currentNFBlockStart = i;
+                    }
+                } else {
+                    if (currentNFBlockStart !== -1) {
+                        nightFinishBlocks.push({
+                            start: currentNFBlockStart,
+                            end: i - 1,
+                            size: i - currentNFBlockStart
+                        });
+                    }
+                    currentNFBlockStart = -1;
+                }
+            }
+            if (currentNFBlockStart !== -1) {
+                nightFinishBlocks.push({
+                    start: currentNFBlockStart,
+                    end: shifts.length - 1,
+                    size: shifts.length - currentNFBlockStart
+                });
+            }
+
+            for (const block of nightFinishBlocks) {
+                if (block.size > 3) {
+                    updateResult('illegal', `Illegale: blocco di ${block.size} turni notturni consecutivi, il limite massimo è 3.`);
+                    return;
+                }
+                
+                const precedingDutyIndex = block.start - 1;
+                if (precedingDutyIndex >= 0) {
+                    const precedingDelayedTime = document.getElementById(`delayed-shift-${precedingDutyIndex + 1}`).value;
+                    
+                    if (block.size === 2) {
+                        if (precedingDelayedTime && timeToMinutes(precedingDelayedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingDelayedTime) <= timeToMinutes('04:59')) {
+                            const firstNightDuty = block.start + 1;
+                            const illegalMessage = `
+                                    <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE: REGOLA RIGIDA VIOLATA</h3>
+                                    <p class="text-sm font-normal text-red-800 mb-2">
+                                        Il turno precedente (Giorno ${precedingDutyIndex + 1}) è terminato dopo le 23:59 a causa di un ritardo.
+                                    </p>
+                                    <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">Conseguenza:</h4>
+                                    <ul class="list-disc list-inside text-sm font-normal text-red-800 text-left">
+                                        <li>Puoi svolgere **solo il primo turno notturno** (Giorno ${firstNightDuty}) dei due turni notturni consecutivi previsti.</li>
+                                    </ul>
+                                `;
+                            updateResult('illegal', illegalMessage);
+                            return;
+                        }
+                    } else if (block.size === 3) {
+                        const precedingTimeMinutes = timeToMinutes(getFinalShiftTime(precedingDutyIndex + 1));
+                        const limitStart = timeToMinutes('21:00');
+                        const limitEnd = timeToMinutes('23:59');
+
+                        if (precedingDelayedTime && timeToMinutes(precedingDelayedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingDelayedTime) <= timeToMinutes('04:59')) {
+                             const firstNightDuty = block.start + 1;
+                             const illegalMessage = `
+                                    <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE: REGOLA FLESSIBILE VIOLATA</h3>
+                                    <p class="text-sm font-normal text-red-800 mb-2">
+                                        Il turno precedente (Giorno ${precedingDutyIndex + 1}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
+                                    </p>
+                                    <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">Conseguenza:</h4>
+                                    <ul class="list-disc list-inside text-sm font-normal text-red-800 text-left">
+                                        <li>Puoi svolgere **solo il primo turno notturno** (Giorno ${firstNightDuty}) dei tre turni notturni consecutivi previsti.</li>
+                                    </ul>
+                                `;
+                             updateResult('illegal', illegalMessage);
+                             return;
+                        } else if (precedingTimeMinutes >= limitStart && precedingTimeMinutes <= limitEnd) {
+                            const firstNightDuty = block.start + 1;
+                            const secondNightDuty = firstNightDuty + 1;
+                            const specialMessage = `
+                                    <h3 class="text-xl font-bold mb-2 text-yellow-800">SITUAZIONE SPECIALE: RITARDO CON SCELTA</h3>
+                                    <p class="text-sm font-normal text-yellow-800 mb-2">
+                                        Il turno precedente (Giorno ${precedingDutyIndex + 1}) è terminato tra le 21:00 e le 23:59 ora locale.
+                                        **Hai la possibilità di scegliere se continuare o meno con il roster pianificato.**
+                                    </p>
+                                    <h4 class="text-lg font-bold mt-4 mb-2 text-yellow-800">Le tue opzioni:</h4>
+                                    <ul class="list-disc list-inside text-sm font-normal text-yellow-800 text-left">
+                                        <li>Se scegli di **non continuare**, potrai svolgere **solo i primi due turni notturni** (Giorno ${firstNightDuty} e Giorno ${secondNightDuty}) dei tre turni notturni consecutivi.</li>
+                                        <li>Se scegli di **continuare**, il programma dei tre turni potrà proseguire.</li>
+                                        <li>L'assistente di volo deve comunicare al comandante la sua intenzione di continuare o meno con il programma.</li>
+                                    </ul>
+                                `;
+                            updateResult('special', specialMessage);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // --- NUOVE REGOLE PER "DISRUPTIVE DUTIES" (MODALITÀ 2) ---
+
+            // Verifica della consecutività dei "disruptive duties"
+            let disruptiveBlocks = [];
+            let currentDBBlockStart = -1;
+
+            for (let i = 0; i < shifts.length; i++) {
+                if (isDisruptiveDuty(shifts[i])) {
+                    if (currentDBBlockStart === -1) {
+                        currentDBBlockStart = i;
+                    }
+                } else {
+                    if (currentDBBlockStart !== -1) {
+                        disruptiveBlocks.push({
+                            start: currentDBBlockStart,
+                            end: i - 1,
+                            size: i - currentDBBlockStart
+                        });
+                    }
+                    currentDBBlockStart = -1;
+                }
+            }
+            if (currentDBBlockStart !== -1) {
+                disruptiveBlocks.push({
+                    start: currentDBBlockStart,
+                    end: shifts.length - 1,
+                    size: shifts.length - currentDBBlockStart
+                });
+            }
+
+            for (const block of disruptiveBlocks) {
+                if (block.size > 3) {
+                    updateResult('illegal', `Illegale: blocco di ${block.size} turni "disruptive" consecutivi, il limite massimo è 3.`);
+                    return;
+                }
+            }
+
+            // Verifica del limite di 4 "disruptive duties" in 7 giorni
+            let disruptiveCount = 0;
+            for (let i = 0; i < shifts.length; i++) {
+                if (isDisruptiveDuty(shifts[i])) {
+                    disruptiveCount++;
+                }
+            }
+
+            if (disruptiveCount > 4) {
+                updateResult('illegal', `Illegale: hai un totale di ${disruptiveCount} turni "disruptive" in 7 giorni, il limite massimo è 4.`);
+                return;
+            }
+            
+            updateResult('legal', 'Il turno è legale.');
+        };
+
+        const updateResult = (status, message) => {
+            resultBox.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'text-white', 'text-yellow-800', 'text-red-800');
+            resultBox.innerHTML = '';
+            
+            if (status === 'legal') {
+                resultBox.classList.add('bg-green-500', 'text-white');
+                resultBox.innerHTML = 'Turno Legale!';
+            } else if (status === 'illegal') {
+                resultBox.classList.add('bg-red-500', 'text-red-800');
+                resultBox.innerHTML = message;
+            } else if (status === 'special') {
+                resultBox.classList.add('bg-yellow-500', 'text-yellow-800');
+                resultBox.innerHTML = message;
+            }
+            
+            resultBox.classList.add('scale-100', 'opacity-100');
+        };
+
+        clearBtn.addEventListener('click', () => {
+            const inputs = shiftInputsContainer.querySelectorAll('input[type="time"]');
+            inputs.forEach(input => input.value = '');
+            resultBox.classList.remove('scale-100', 'opacity-100');
+        });
+
+        verifyBtn.addEventListener('click', () => {
+            resultBox.classList.remove('scale-100', 'opacity-100'); 
+            setTimeout(checkShifts, 300);
+        });
+    </script>
+</body>
+</html>
