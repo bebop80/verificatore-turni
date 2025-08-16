@@ -323,50 +323,6 @@
                 }
             }
 
-            // Verifica della consecutività dei "disruptive duties"
-            let disruptiveBlocks = [];
-            let currentDBBlockStart = -1;
-
-            for (let i = 0; i < shifts.length; i++) {
-                if (isDisruptiveDuty(shifts[i].time)) {
-                    if (currentDBBlockStart === -1) {
-                        currentDBBlockStart = i;
-                    }
-                } else {
-                    if (currentDBBlockStart !== -1) {
-                        disruptiveBlocks.push({
-                            start: currentDBBlockStart,
-                            end: i - 1,
-                            size: i - currentDBBlockStart
-                        });
-                    }
-                    currentDBBlockStart = -1;
-                }
-            }
-            if (currentDBBlockStart !== -1) {
-                disruptiveBlocks.push({
-                    start: currentDBBlockStart,
-                    end: shifts.length - 1,
-                    size: shifts.length - currentDBBlockStart
-                });
-            }
-
-            for (const block of disruptiveBlocks) {
-                if (block.size > 3) {
-                    const illegalMessage = `
-                            <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE</h3>
-                            <p class="text-sm font-normal text-red-800 mb-2">
-                                Blocco di ${block.size} turni "disruptive" consecutivi.
-                            </p>
-                            <p class="text-sm font-normal text-red-800 mt-2 mb-2">
-                                Il limite massimo è 3.
-                            </p>
-                        `;
-                    updateResult('illegal', illegalMessage);
-                    return;
-                }
-            }
-
             // Verifica del limite di 4 "disruptive duties" in 7 giorni
             let disruptiveCount = 0;
             for (let i = 0; i < shifts.length; i++) {
@@ -425,4 +381,3 @@
     </script>
 </body>
 </html>
-
