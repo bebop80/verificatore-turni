@@ -62,7 +62,7 @@
 
         <!-- Sezione per l'inserimento dei turni -->
         <div class="mb-6">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Inserisci i tuoi turni (fino ad un massimo di 7 giorni):</h2>
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Inserisci i tuoi turni (fino a 7 giorni):</h2>
             <div id="shiftInputs" class="flex flex-col gap-6">
                 <!-- I campi di input verranno generati dinamicamente qui -->
             </div>
@@ -325,20 +325,23 @@
 
             // Verifica del limite di 4 "disruptive duties" in 7 giorni
             let disruptiveCount = 0;
+            const disruptiveDays = []; // Nuovo array per memorizzare i giorni disruptive
             for (let i = 0; i < shifts.length; i++) {
                 if (isDisruptiveDuty(shifts[i].time)) {
                     disruptiveCount++;
+                    disruptiveDays.push(shifts[i].day); // Aggiunge il numero del giorno all'array
                 }
             }
 
             if (disruptiveCount > 4) {
+                const disruptiveDaysString = disruptiveDays.map(day => `Giorno ${day}`).join(', '); // Crea una stringa leggibile dei giorni
                 const illegalMessage = `
-                            <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE</h3>
+                            <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
                             <p class="text-sm font-normal text-red-800 mb-2">
-                                Hai un totale di ${disruptiveCount} turni "disruptive" in 7 giorni.
+                                Sono presenti ${disruptiveCount} "disruptive" duties in 7 giorni, il limite massimo è 4.
                             </p>
                             <p class="text-sm font-normal text-red-800 mt-2 mb-2">
-                                Il limite massimo è 4.
+                                I giorni interessati sono: ${disruptiveDaysString}.
                             </p>
                         `;
                 updateResult('illegal', illegalMessage);
