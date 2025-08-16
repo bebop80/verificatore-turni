@@ -48,13 +48,17 @@
                 transform: scale(1);
             }
         }
+        input[type="time"] {
+            width: 100px;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
     <!-- Contenitore principale dell'app -->
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Night and Disruptive Duties</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Night and Disruptive Duties</h1>
+        <p class="text-sm text-gray-500 text-center mb-8">Strumento per verificare se la regolamentazione prevista dal manuale nei paragrafi OMA 7.4.7 (1,2) Night Duties e 7.4.10.1 Consecutive Easyjet Disruptive Duties è stata correttamente applicata.</p>
 
         <!-- Sezione per l'inserimento dei turni -->
         <div class="mb-6">
@@ -82,19 +86,23 @@
         for (let i = 1; i <= 7; i++) {
             const container = document.createElement('div');
             container.id = `day-container-${i}`;
-            container.className = 'bg-blue-50 p-6 rounded-2xl shadow-inner grid grid-cols-1 sm:grid-cols-2 gap-4';
+            container.className = 'bg-blue-50 p-6 rounded-2xl shadow-inner flex flex-col gap-4';
             
             // Titolo per il giorno
             const dayTitle = document.createElement('h3');
-            dayTitle.className = 'col-span-1 sm:col-span-2 text-md font-semibold text-blue-800';
+            dayTitle.className = 'text-md font-semibold text-blue-800';
             dayTitle.textContent = `Giorno ${i}:`;
             container.appendChild(dayTitle);
+            
+            // Contenitore per i campi di input su una singola riga
+            const inputsRow = document.createElement('div');
+            inputsRow.className = 'flex flex-col sm:flex-row items-center justify-between gap-4';
 
             // Input per l'orario previsto
             const plannedGroup = document.createElement('div');
-            plannedGroup.className = 'flex flex-col';
+            plannedGroup.className = 'flex flex-row items-center gap-2';
             const plannedLabel = document.createElement('label');
-            plannedLabel.className = 'text-gray-700 font-medium mb-1 text-sm';
+            plannedLabel.className = 'text-gray-700 font-medium text-sm';
             plannedLabel.textContent = `Orario Previsto`;
             const plannedInput = document.createElement('input');
             plannedInput.type = 'time';
@@ -102,13 +110,29 @@
             plannedInput.className = 'p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
             plannedGroup.appendChild(plannedLabel);
             plannedGroup.appendChild(plannedInput);
-            container.appendChild(plannedGroup);
+            inputsRow.appendChild(plannedGroup);
+
+            // Checkbox per il "Day Off"
+            const offCheckboxGroup = document.createElement('div');
+            offCheckboxGroup.className = 'flex items-center gap-2';
+            const offCheckbox = document.createElement('input');
+            offCheckbox.type = 'checkbox';
+            offCheckbox.id = `off-day-${i}`;
+            offCheckbox.className = 'h-5 w-5 text-blue-600 rounded focus:ring-blue-500';
+            const offLabel = document.createElement('label');
+            offLabel.htmlFor = `off-day-${i}`;
+            offLabel.className = 'text-gray-700 font-medium text-sm select-none';
+            offLabel.textContent = 'DAY OFF';
+            offCheckboxGroup.appendChild(offCheckbox);
+            offCheckboxGroup.appendChild(offLabel);
+            inputsRow.appendChild(offCheckboxGroup);
+
 
             // Input per l'orario ritardato (opzionale)
             const delayedGroup = document.createElement('div');
-            delayedGroup.className = 'flex flex-col';
+            delayedGroup.className = 'flex flex-row items-center gap-2';
             const delayedLabel = document.createElement('label');
-            delayedLabel.className = 'text-gray-700 font-medium mb-1 text-sm';
+            delayedLabel.className = 'text-gray-700 font-medium text-sm';
             delayedLabel.textContent = `Orario Ritardato (Opzionale)`;
             const delayedInput = document.createElement('input');
             delayedInput.type = 'time';
@@ -116,9 +140,32 @@
             delayedInput.className = 'p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
             delayedGroup.appendChild(delayedLabel);
             delayedGroup.appendChild(delayedInput);
-            container.appendChild(delayedGroup);
+            inputsRow.appendChild(delayedGroup);
 
+            container.appendChild(inputsRow);
             shiftInputsContainer.appendChild(container);
+            
+            // Logica per gestire lo stato di "Day Off"
+            offCheckbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    plannedInput.value = '';
+                    delayedInput.value = '';
+                    plannedInput.disabled = true;
+                    delayedInput.disabled = true;
+                    plannedInput.placeholder = 'DAY OFF';
+                    delayedInput.placeholder = 'DAY OFF';
+                    plannedInput.style.backgroundColor = '#e5e7eb';
+                    delayedInput.style.backgroundColor = '#e5e7eb';
+                } else {
+                    plannedInput.disabled = false;
+                    delayedInput.disabled = false;
+                    plannedInput.placeholder = '';
+                    delayedInput.placeholder = '';
+                    plannedInput.style.backgroundColor = '';
+                    delayedInput.style.backgroundColor = '';
+                }
+            });
+
         }
 
         // Funzione per convertire un orario 'HH:mm' in minuti totali
@@ -150,13 +197,16 @@
         const getFinalShiftTime = (dayIndex) => {
             const delayedInput = document.getElementById(`delayed-shift-${dayIndex}`);
             const plannedInput = document.getElementById(`planned-shift-${dayIndex}`);
-            return delayedInput.value || plannedInput.value;
+            // Se il campo è disabilitato (DAY OFF), restituisce una stringa vuota
+            return plannedInput.disabled ? '' : (delayedInput.value || plannedInput.value);
         };
         
         // Funzione di verifica principale basata sulle regole fornite
         const checkShifts = () => {
-            const shifts = Array.from({length: 7}, (_, i) => getFinalShiftTime(i + 1))
-                .filter(time => time !== '');
+            // Crea un array di oggetti per mantenere il riferimento al numero del giorno originale
+            const allShifts = Array.from({length: 7}, (_, i) => ({ day: i + 1, time: getFinalShiftTime(i + 1) }));
+            // Filtra i turni non compilati per considerare i giorni "off".
+            const shifts = allShifts.filter(s => s.time !== '');
             
             if (shifts.length < 1) {
                 updateResult('legal', 'Inserisci almeno un turno per la verifica');
@@ -168,7 +218,7 @@
             let currentNFBlockStart = -1;
 
             for (let i = 0; i < shifts.length; i++) {
-                if (isNightFinish(shifts[i])) {
+                if (isNightFinish(shifts[i].time)) {
                     if (currentNFBlockStart === -1) {
                         currentNFBlockStart = i;
                     }
@@ -199,12 +249,14 @@
                 
                 const precedingDutyIndex = block.start - 1;
                 if (precedingDutyIndex >= 0) {
-                    const precedingPlannedTime = document.getElementById(`planned-shift-${precedingDutyIndex + 1}`).value;
-                    const precedingDelayedTime = document.getElementById(`delayed-shift-${precedingDutyIndex + 1}`).value;
+                    // Ottiene il numero del giorno originale per il turno precedente
+                    const precedingDutyDay = shifts[precedingDutyIndex].day;
+                    const precedingPlannedTime = document.getElementById(`planned-shift-${precedingDutyDay}`).value;
+                    const precedingDelayedTime = document.getElementById(`delayed-shift-${precedingDutyDay}`).value;
 
                     if (block.size === 2) {
                         if (precedingPlannedTime && timeToMinutes(precedingPlannedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingPlannedTime) <= timeToMinutes('04:59')) {
-                            updateResult('illegal', `Illegale: Il giorno (in questione ad es. Giorno ${precedingDutyIndex + 1}) precedente ad una serie di 2 night duties non deve terminare oltre le 23:59.`);
+                            updateResult('illegal', `Illegale: Il giorno (in questione ad es. Giorno ${precedingDutyDay}) precedente ad una serie di 2 night duties non deve terminare oltre le 23:59.`);
                             return;
                         }
                         
@@ -212,7 +264,7 @@
                              const illegalMessage = `
                                     <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE</h3>
                                     <p class="text-sm font-normal text-red-800 mb-2">
-                                        Il turno precedente ai 2 night duties consecutivi successivi (Giorno ${precedingDutyIndex + 1}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
+                                        Il turno precedente ai 2 night duties consecutivi successivi (Giorno ${precedingDutyDay}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
                                     </p>
                                     <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">ATTENZIONE</h4>
                                     <p class="text-sm font-normal text-red-800 mb-2">
@@ -223,13 +275,13 @@
                             return;
                         }
                     } else if (block.size === 3) {
-                        const precedingTimeMinutes = timeToMinutes(getFinalShiftTime(precedingDutyIndex + 1));
+                        const precedingTimeMinutes = timeToMinutes(getFinalShiftTime(precedingDutyDay));
                         const precedingPlannedMinutes = timeToMinutes(precedingPlannedTime);
                         const limitStart = timeToMinutes('21:00');
                         const limitEnd = timeToMinutes('23:59');
 
                         if (precedingPlannedTime && precedingPlannedMinutes > limitStart) {
-                             updateResult('illegal', `Illegale: blocco di 3 turni notturni consecutivi. Il turno precedente (Giorno ${precedingDutyIndex + 1}) ai tre giorni di night duties (orario compreso tra le 02:00 e le 04:59) non può terminare oltre le ore 21:00`);
+                             updateResult('illegal', `Illegale: blocco di 3 turni notturni consecutivi. Il turno precedente (Giorno ${precedingDutyDay}) ai tre giorni di night duties (orario compreso tra le 02:00 e le 04:59) non può terminare oltre le ore 21:00`);
                              return;
                         }
 
@@ -237,7 +289,7 @@
                              const illegalMessage = `
                                     <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE</h3>
                                     <p class="text-sm font-normal text-red-800 mb-2">
-                                        Il turno precedente ai 3 night duties consecutivi (Giorno ${precedingDutyIndex + 1}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
+                                        Il turno precedente ai 3 night duties consecutivi (Giorno ${precedingDutyDay}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
                                     </p>
                                     <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">ATTENZIONE</h4>
                                     <p class="text-sm font-normal text-red-800 mb-2">
@@ -250,7 +302,7 @@
                             const specialMessage = `
                                     <h3 class="text-xl font-bold mb-2 text-yellow-800">ATTENZIONE</h3>
                                     <p class="text-sm font-normal text-yellow-800 mb-2">
-                                        Il turno precedente ai 3 night duties (Giorno ${precedingDutyIndex + 1}) è terminato tra le 21:00 e le 23:59 ora locale.
+                                        Il turno precedente ai 3 night duties (Giorno ${precedingDutyDay}) è terminato tra le 21:00 e le 23:59 ora locale.
                                     </p>
                                     <h4 class="text-lg font-bold mt-4 mb-2 text-yellow-800">OPZIONI</h4>
                                     <ul class="list-disc list-inside text-sm font-normal text-yellow-800 text-left">
@@ -259,6 +311,9 @@
                                     </ul>
                                     <p class="text-sm font-normal text-yellow-800 mt-4 mb-2">
                                         L'assistente di volo DOVRA' comunicare esplicitamente al comandante la sua intenzione di continuare o meno con il programma.
+                                    </p>
+                                    <p class="text-xs font-normal text-yellow-800 mt-4">
+                                        Sul manuale - <u>OMA 7.4.7.2 Three Consecutive Night Finish Duties paragrafo 1.</u>
                                     </p>
                                 `;
                             updateResult('special', specialMessage);
@@ -273,7 +328,7 @@
             let currentDBBlockStart = -1;
 
             for (let i = 0; i < shifts.length; i++) {
-                if (isDisruptiveDuty(shifts[i])) {
+                if (isDisruptiveDuty(shifts[i].time)) {
                     if (currentDBBlockStart === -1) {
                         currentDBBlockStart = i;
                     }
@@ -315,7 +370,7 @@
             // Verifica del limite di 4 "disruptive duties" in 7 giorni
             let disruptiveCount = 0;
             for (let i = 0; i < shifts.length; i++) {
-                if (isDisruptiveDuty(shifts[i])) {
+                if (isDisruptiveDuty(shifts[i].time)) {
                     disruptiveCount++;
                 }
             }
