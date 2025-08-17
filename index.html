@@ -71,6 +71,7 @@
         <!-- Pulsante di verifica e area per il risultato -->
         <div class="flex flex-col gap-4">
             <button id="verifyBtn" class="btn-primary text-white font-bold py-3 px-6 rounded-xl text-lg shadow-lg w-full">VERIFICA</button>
+            <button id="clearBtn" class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-colors w-full mt-2">Cancella Tutto</button>
             <div id="resultBox" class="text-center font-bold text-md p-4 rounded-xl opacity-0 transform scale-95">
                 <!-- Il risultato apparirà qui -->
             </div>
@@ -79,6 +80,7 @@
 
     <script>
         const verifyBtn = document.getElementById('verifyBtn');
+        const clearBtn = document.getElementById('clearBtn');
         const shiftInputsContainer = document.getElementById('shiftInputs');
         const resultBox = document.getElementById('resultBox');
 
@@ -198,27 +200,32 @@
             const delayedInput = document.getElementById(`delayed-shift-${dayIndex}`);
             const plannedInput = document.getElementById(`planned-shift-${dayIndex}`);
             // Se il campo è disabilitato (DAY OFF), restituisce una stringa vuota
-            return plannedInput.disabled ? '' : (delayedInput.value || plannedInput.value);
+            if (plannedInput.disabled) {
+                return '';
+            }
+            return delayedInput.value || plannedInput.value;
         };
         
         // Funzione di verifica principale basata sulle regole fornite
         const checkShifts = () => {
-            // Crea un array di oggetti per mantenere il riferimento al numero del giorno originale
+            // Include tutti i 7 giorni, inclusi i "Day Off"
             const allShifts = Array.from({length: 7}, (_, i) => ({ day: i + 1, time: getFinalShiftTime(i + 1) }));
-            // Filtra i turni non compilati per considerare i giorni "off".
-            const shifts = allShifts.filter(s => s.time !== '');
+            const shiftsWithTime = allShifts.filter(s => s.time !== '');
             
-            if (shifts.length < 1) {
-                updateResult('legal', 'Inserisci almeno un turno per la verifica');
+            if (shiftsWithTime.length < 1) {
+                updateResult('legal', 'Non sono stati trovati turni da verificare.');
                 return;
             }
+
+            // Inizializza l'array per le ragioni legali
+            const legalReasons = [];
 
             // Verifica delle regole sui "Night Finish"
             let nightFinishBlocks = [];
             let currentNFBlockStart = -1;
 
-            for (let i = 0; i < shifts.length; i++) {
-                if (isNightFinish(shifts[i].time)) {
+            for (let i = 0; i < shiftsWithTime.length; i++) {
+                if (isNightFinish(shiftsWithTime[i].time)) {
                     if (currentNFBlockStart === -1) {
                         currentNFBlockStart = i;
                     }
@@ -236,8 +243,8 @@
             if (currentNFBlockStart !== -1) {
                 nightFinishBlocks.push({
                     start: currentNFBlockStart,
-                    end: shifts.length - 1,
-                    size: shifts.length - currentNFBlockStart
+                    end: shiftsWithTime.length - 1,
+                    size: shiftsWithTime.length - currentNFBlockStart
                 });
             }
 
@@ -249,14 +256,13 @@
                 
                 const precedingDutyIndex = block.start - 1;
                 if (precedingDutyIndex >= 0) {
-                    // Ottiene il numero del giorno originale per il turno precedente
-                    const precedingDutyDay = shifts[precedingDutyIndex].day;
+                    const precedingDutyDay = shiftsWithTime[precedingDutyIndex].day;
                     const precedingPlannedTime = document.getElementById(`planned-shift-${precedingDutyDay}`).value;
                     const precedingDelayedTime = document.getElementById(`delayed-shift-${precedingDutyDay}`).value;
 
                     if (block.size === 2) {
                         if (precedingPlannedTime && timeToMinutes(precedingPlannedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingPlannedTime) <= timeToMinutes('04:59')) {
-                            updateResult('illegal', `Illegale: Il giorno (in questione ad es. Giorno ${precedingDutyDay}) precedente ad una serie di 2 night duties non deve terminare oltre le 23:59.`);
+                            updateResult('illegal', `Illegale: Il giorno (ad es. Giorno ${precedingDutyDay}) precedente ad una serie di 2 night duties non deve terminare oltre le 23:59.`);
                             return;
                         }
                         
@@ -281,7 +287,7 @@
                         const limitEnd = timeToMinutes('23:59');
 
                         if (precedingPlannedTime && precedingPlannedMinutes > limitStart) {
-                             updateResult('illegal', `Illegale: blocco di 3 turni notturni consecutivi. Il turno precedente (Giorno ${precedingDutyDay}) ai tre giorni di night duties (orario compreso tra le 02:00 e le 04:59) non può terminare oltre le ore 21:00`);
+                             updateResult('illegal', `Illegale: blocco di 3 turni notturni consecutivi. Il turno precedente (Giorno ${precedingDutyDay}) ai tre giorni di night duties non può terminare oltre le ore 21:00`);
                              return;
                         }
 
@@ -293,7 +299,7 @@
                                     </p>
                                     <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">ATTENZIONE</h4>
                                     <p class="text-sm font-normal text-red-800 mb-2">
-                                        In questo caso l'assitente di volo potrà svolgere SOLO il primo dei tre turni notturni consecutivi schedulati.
+                                        L'assitente di volo potrà svolgere SOLO il primo dei tre turni notturni consecutivi schedulati.
                                     </p>
                                 `;
                              updateResult('illegal', illegalMessage);
@@ -323,22 +329,65 @@
                 }
             }
 
-            // Verifica del limite di 4 "disruptive duties" in 7 giorni
-            let disruptiveCount = 0;
-            const disruptiveDays = []; // Nuovo array per memorizzare i giorni disruptive
-            for (let i = 0; i < shifts.length; i++) {
-                if (isDisruptiveDuty(shifts[i].time)) {
-                    disruptiveCount++;
-                    disruptiveDays.push(shifts[i].day); // Aggiunge il numero del giorno all'array
+            legalReasons.push("Non sono stati trovati blocchi illegali di <b>Night Finish Duties</b>.");
+
+            // --- CONTROLLO DEI DISRUPTIVE DUTIES CONSECUTIVI ---
+            let consecutiveDisruptiveCount = 0;
+            let disruptiveDaysInBlock = [];
+            
+            for (let i = 0; i < allShifts.length; i++) {
+                if (isDisruptiveDuty(allShifts[i].time)) {
+                    consecutiveDisruptiveCount++;
+                    disruptiveDaysInBlock.push(allShifts[i].day);
+                } else {
+                    if (consecutiveDisruptiveCount > 3) {
+                        const daysString = disruptiveDaysInBlock.map(day => `Giorno ${day}`).join(', ');
+                        const illegalMessage = `
+                            <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
+                            <p class="text-sm font-normal text-red-800 mb-2">
+                                Hai un blocco di ${consecutiveDisruptiveCount} turni "disruptive" consecutivi, il limite massimo è 3.
+                            </p>
+                            <p class="text-sm font-normal text-red-800 mt-2 mb-2">
+                                I giorni interessati sono: ${daysString}.
+                            </p>
+                        `;
+                        updateResult('illegal', illegalMessage);
+                        return;
+                    }
+                    consecutiveDisruptiveCount = 0;
+                    disruptiveDaysInBlock.length = 0;
                 }
             }
+            
+            // Controllo finale per un blocco consecutivo che termina l'array
+            if (consecutiveDisruptiveCount > 3) {
+                const daysString = disruptiveDaysInBlock.map(day => `Giorno ${day}`).join(', ');
+                const illegalMessage = `
+                    <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
+                    <p class="text-sm font-normal text-red-800 mb-2">
+                        Hai un blocco di ${consecutiveDisruptiveCount} turni "disruptive" consecutivi, il limite massimo è 3.
+                    </p>
+                    <p class="text-sm font-normal text-red-800 mt-2 mb-2">
+                        I giorni interessati sono: ${daysString}.
+                    </p>
+                `;
+                updateResult('illegal', illegalMessage);
+                return;
+            }
 
-            if (disruptiveCount > 4) {
-                const disruptiveDaysString = disruptiveDays.map(day => `Giorno ${day}`).join(', '); // Crea una stringa leggibile dei giorni
+            legalReasons.push("Non sono stati trovati blocchi illegali di turni <b>disruptive consecutivi</b> (massimo 3).");
+
+
+            // Ora controlla il totale dei disruptive duties in 7 giorni
+            const disruptiveDays = allShifts.filter(s => isDisruptiveDuty(s.time));
+            const totalDisruptiveCount = disruptiveDays.length;
+
+            if (totalDisruptiveCount > 4) {
+                const disruptiveDaysString = disruptiveDays.map(day => `Giorno ${day.day}`).join(', ');
                 const illegalMessage = `
                             <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
                             <p class="text-sm font-normal text-red-800 mb-2">
-                                Sono presenti ${disruptiveCount} "disruptive" duties in 7 giorni, il limite massimo è 4.
+                                Sono presenti ${totalDisruptiveCount} "disruptive" duties in 7 giorni, il limite massimo è 4.
                             </p>
                             <p class="text-sm font-normal text-red-800 mt-2 mb-2">
                                 I giorni interessati sono: ${disruptiveDaysString}.
@@ -347,8 +396,19 @@
                 updateResult('illegal', illegalMessage);
                 return;
             }
+
+            legalReasons.push(`Il numero totale di turni <b>disruptive</b> in 7 giorni (${totalDisruptiveCount}) è conforme alla normativa (massimo 4).`);
             
-            updateResult('legal', 'Il turno è legale');
+            // Se tutto è andato bene, il turno è legale
+            updateResult('legal', `
+                <h3 class="text-xl font-bold mb-2 text-green-800">TURNO LEGALE</h3>
+                <p class="text-sm font-normal text-green-800 mb-2">
+                    La pianificazione del turno è conforme a tutte le normative verificate.
+                </p>
+                <ul class="list-disc list-inside text-sm font-normal text-green-800 text-left mt-4">
+                    ${legalReasons.map(reason => `<li>${reason}</li>`).join('')}
+                </ul>
+            `);
         };
 
         const updateResult = (status, message) => {
@@ -357,7 +417,7 @@
             
             if (status === 'legal') {
                 resultBox.classList.add('result-legal');
-                resultBox.innerHTML = 'Il turno è legale';
+                resultBox.innerHTML = message;
             } else if (status === 'illegal') {
                 resultBox.classList.add('result-illegal');
                 resultBox.innerHTML = message;
@@ -371,6 +431,28 @@
         };
 
         verifyBtn.addEventListener('click', checkShifts);
+
+        clearBtn.addEventListener('click', () => {
+            for (let i = 1; i <= 7; i++) {
+                const plannedInput = document.getElementById(`planned-shift-${i}`);
+                const delayedInput = document.getElementById(`delayed-shift-${i}`);
+                const offCheckbox = document.getElementById(`off-day-${i}`);
+
+                plannedInput.value = '';
+                delayedInput.value = '';
+                offCheckbox.checked = false;
+                plannedInput.disabled = false;
+                delayedInput.disabled = false;
+                plannedInput.placeholder = '';
+                delayedInput.placeholder = '';
+                plannedInput.style.backgroundColor = '';
+                delayedInput.style.backgroundColor = '';
+            }
+            
+            resultBox.classList.remove('opacity-100', 'scale-100', 'result-legal', 'result-illegal', 'result-special');
+            resultBox.classList.add('opacity-0', 'scale-95');
+            resultBox.innerHTML = '';
+        });
 
         // Aggiungi un listener per ogni input per abilitare la verifica
         const inputs = shiftInputsContainer.querySelectorAll('input[type="time"]');
