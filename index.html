@@ -3,466 +3,731 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VERIFICA NIGHT and DISRUPTIVE DUTIES</title>
-    <!-- Font Poppins da Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Carica il framework Tailwind CSS per uno stile moderno e reattivo -->
+    <title>Night and Disruptive Duties - Easyjet Compliance</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #d1e5f8 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
         }
-        .btn-primary {
-            background: linear-gradient(to right, #2563eb, #3b82f6);
+        
+        .gradient-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.4);
         }
-        .btn-primary:hover {
+        
+        .gradient-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 7px 20px 0 rgba(102, 126, 234, 0.6);
         }
-        .result-legal {
-            background-color: #4ade80;
-            color: #166534;
-            animation: fadeIn 0.5s ease-in-out forwards;
+        
+        .result-enter {
+            animation: slideIn 0.5s ease-out;
         }
-        .result-illegal {
-            background-color: #fca5a5;
-            color: #991b1b;
-            animation: fadeIn 0.5s ease-in-out forwards;
-        }
-        .result-special {
-            background-color: #fde68a;
-            color: #92400e;
-            animation: fadeIn 0.5s ease-in-out forwards;
-        }
-        @keyframes fadeIn {
+        
+        @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: scale(0.95);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
-                transform: scale(1);
+                transform: translateY(0);
             }
         }
+        
+        .day-section {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .day-1 { border-left-color: #FF6B6B; }
+        .day-2 { border-left-color: #4ECDC4; }
+        .day-3 { border-left-color: #FFD166; }
+        .day-4 { border-left-color: #6A0572; }
+        .day-5 { border-left-color: #1A535C; }
+        .day-6 { border-left-color: #FF9F1C; }
+        .day-7 { border-left-color: #2EC4B6; }
+        
+        .day-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        
         input[type="time"] {
-            width: 100px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .message-content {
+            line-height: 1.8;
+        }
+        
+        .message-content strong {
+            color: inherit;
+            font-weight: 600;
+        }
+        
+        .option-list {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .option-list li {
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 0.5rem;
+        }
+        
+        .option-list li::before {
+            content: "→";
+            position: absolute;
+            left: -1.5rem;
+            color: #92400e;
+            font-weight: bold;
+        }
+        
+        .header-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+        
+        .main-container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .verify-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+        }
+        
+        .result-card {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .result-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .violation-point {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+        }
+        
+        .warning-point {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-
-    <!-- Contenitore principale dell'app -->
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Night and Disruptive Duties</h1>
-        <p class="text-sm text-gray-500 text-center mb-8">Strumento per verificare se la regolamentazione prevista dal manuale nei paragrafi OMA 7.4.7 (1,2) Night Duties e 7.4.10.1 Consecutive Easyjet Disruptive Duties è stata correttamente applicata.</p>
-
-        <!-- Sezione per l'inserimento dei turni -->
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Inserisci i tuoi turni (fino a 7 giorni):</h2>
-            <div id="shiftInputs" class="flex flex-col gap-6">
-                <!-- I campi di input verranno generati dinamicamente qui -->
+<body class="flex flex-col">
+    <div class="container mx-auto px-4 py-8 max-w-6xl flex-1">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="header-bg">
+                <h1 class="text-3xl md:text-4xl font-bold mb-3">Night and Disruptive Duties</h1>
+                <p class="text-base opacity-90 max-w-3xl mx-auto">
+                    Strumento per verificare se la regolamentazione prevista dal manuale nei paragrafi OMA 7.4.7 (1,2) Night Duties e 7.4.10.1 Consecutive Easyjet Disruptive Duties è stata correttamente applicata.
+                </p>
+                <div class="mt-3">
+                    <i class="fas fa-plane-departure text-2xl opacity-70"></i>
+                </div>
             </div>
-        </div>
-
-        <!-- Pulsante di verifica e area per il risultato -->
-        <div class="flex flex-col gap-4">
-            <button id="verifyBtn" class="btn-primary text-white font-bold py-3 px-6 rounded-xl text-lg shadow-lg w-full">VERIFICA</button>
-            <button id="clearBtn" class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-colors w-full mt-2">Cancella Tutto</button>
-            <div id="resultBox" class="text-center font-bold text-md p-4 rounded-xl opacity-0 transform scale-95">
-                <!-- Il risultato apparirà qui -->
+        </header>
+        <!-- Main Content -->
+        <main class="main-container p-6 md:p-8">
+            <!-- Days Grid - Now vertical layout -->
+            <div class="space-y-4 mb-8">
+                <!-- Day 1 -->
+                <div class="day-section day-1 bg-gray-50 rounded-lg p-4 flex items-center" data-day="1">
+                    <div class="w-24 day-header text-lg">Giorno 1</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-1">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-1" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-1" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-1">
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 2 -->
+                <div class="day-section day-2 bg-gray-50 rounded-lg p-4 flex items-center" data-day="2">
+                    <div class="w-24 day-header text-lg">Giorno 2</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-2">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-2" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-2" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-2">
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 3 -->
+                <div class="day-section day-3 bg-gray-50 rounded-lg p-4 flex items-center" data-day="3">
+                    <div class="w-24 day-header text-lg">Giorno 3</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-3">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-3" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-3" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-3">
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 4 -->
+                <div class="day-section day-4 bg-gray-50 rounded-lg p-4 flex items-center" data-day="4">
+                    <div class="w-24 day-header text-lg">Giorno 4</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-4">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-4" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-4" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-4">
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 5 -->
+                <div class="day-section day-5 bg-gray-50 rounded-lg p-4 flex items-center" data-day="5">
+                    <div class="w-24 day-header text-lg">Giorno 5</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-5">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-5" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-5" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-5">
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 6 -->
+                <div class="day-section day-6 bg-gray-50 rounded-lg p-4 flex items-center" data-day="6">
+                    <div class="w-24 day-header text-lg">Giorno 6</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-6">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-6" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-6" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-6">
+                        </div>
+                    </div>
+                </div>
+                <!-- Day 7 -->
+                <div class="day-section day-7 bg-gray-50 rounded-lg p-4 flex items-center" data-day="7">
+                    <div class="w-24 day-header text-lg">Giorno 7</div>
+                    <div class="flex-1 flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-7">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="dayoff-7" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="dayoff-7" class="ml-2 text-sm font-medium text-gray-700">DAY OFF</label>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Orario Ritardato (opzionale)</label>
+                            <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="delayed-7">
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+            <!-- Verify Button -->
+            <div class="verify-section text-center">
+                <button onclick="verifyCompliance()" class="gradient-button text-white font-semibold py-3 px-8 rounded-lg text-lg inline-flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    VERIFICA
+                </button>
+            </div>
+            <!-- Results Area -->
+            <div id="results" class="hidden">
+                <!-- Results will be dynamically inserted here -->
+            </div>
+        </main>
     </div>
-
+    <!-- Footer with Disclaimer -->
+    <footer class="bg-gray-800 text-gray-300 py-6 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">
+                © 2025 verifica-night-disruptive-duties.netlify.app – Tutti i diritti riservati. Il design, il codice e i contenuti di questa web app sono protetti da copyright. È vietata la riproduzione o diffusione non autorizzata, anche parziale, senza esplicita autorizzazione.
+            </p>
+        </div>
+    </footer>
     <script>
-        const verifyBtn = document.getElementById('verifyBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const shiftInputsContainer = document.getElementById('shiftInputs');
-        const resultBox = document.getElementById('resultBox');
-
-        // Genera 7 gruppi di campi di input per i turni
-        for (let i = 1; i <= 7; i++) {
-            const container = document.createElement('div');
-            container.id = `day-container-${i}`;
-            container.className = 'bg-blue-50 p-6 rounded-2xl shadow-inner flex flex-col gap-4';
-            
-            // Titolo per il giorno
-            const dayTitle = document.createElement('h3');
-            dayTitle.className = 'text-md font-semibold text-blue-800';
-            dayTitle.textContent = `Giorno ${i}:`;
-            container.appendChild(dayTitle);
-            
-            // Contenitore per i campi di input su una singola riga
-            const inputsRow = document.createElement('div');
-            inputsRow.className = 'flex flex-col sm:flex-row items-center justify-between gap-4';
-
-            // Input per l'orario previsto
-            const plannedGroup = document.createElement('div');
-            plannedGroup.className = 'flex flex-row items-center gap-2';
-            const plannedLabel = document.createElement('label');
-            plannedLabel.className = 'text-gray-700 font-medium text-sm';
-            plannedLabel.textContent = `Orario Previsto`;
-            const plannedInput = document.createElement('input');
-            plannedInput.type = 'time';
-            plannedInput.id = `planned-shift-${i}`;
-            plannedInput.className = 'p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
-            plannedGroup.appendChild(plannedLabel);
-            plannedGroup.appendChild(plannedInput);
-            inputsRow.appendChild(plannedGroup);
-
-            // Checkbox per il "Day Off"
-            const offCheckboxGroup = document.createElement('div');
-            offCheckboxGroup.className = 'flex items-center gap-2';
-            const offCheckbox = document.createElement('input');
-            offCheckbox.type = 'checkbox';
-            offCheckbox.id = `off-day-${i}`;
-            offCheckbox.className = 'h-5 w-5 text-blue-600 rounded focus:ring-blue-500';
-            const offLabel = document.createElement('label');
-            offLabel.htmlFor = `off-day-${i}`;
-            offLabel.className = 'text-gray-700 font-medium text-sm select-none';
-            offLabel.textContent = 'DAY OFF';
-            offCheckboxGroup.appendChild(offCheckbox);
-            offCheckboxGroup.appendChild(offLabel);
-            inputsRow.appendChild(offCheckboxGroup);
-
-
-            // Input per l'orario ritardato (opzionale)
-            const delayedGroup = document.createElement('div');
-            delayedGroup.className = 'flex flex-row items-center gap-2';
-            const delayedLabel = document.createElement('label');
-            delayedLabel.className = 'text-gray-700 font-medium text-sm';
-            delayedLabel.textContent = `Orario Ritardato (Opzionale)`;
-            const delayedInput = document.createElement('input');
-            delayedInput.type = 'time';
-            delayedInput.id = `delayed-shift-${i}`;
-            delayedInput.className = 'p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500';
-            delayedGroup.appendChild(delayedLabel);
-            delayedGroup.appendChild(delayedInput);
-            inputsRow.appendChild(delayedGroup);
-
-            container.appendChild(inputsRow);
-            shiftInputsContainer.appendChild(container);
-            
-            // Logica per gestire lo stato di "Day Off"
-            offCheckbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    plannedInput.value = '';
-                    delayedInput.value = '';
-                    plannedInput.disabled = true;
+        // Add event listeners for DAY OFF checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const day = this.id.split('-')[1];
+                const scheduledInput = document.getElementById(`scheduled-${day}`);
+                const delayedInput = document.getElementById(`delayed-${day}`);
+                
+                if (this.checked) {
+                    scheduledInput.disabled = true;
                     delayedInput.disabled = true;
-                    plannedInput.placeholder = 'DAY OFF';
-                    delayedInput.placeholder = 'DAY OFF';
-                    plannedInput.style.backgroundColor = '#e5e7eb';
-                    delayedInput.style.backgroundColor = '#e5e7eb';
+                    scheduledInput.value = '';
+                    delayedInput.value = '';
                 } else {
-                    plannedInput.disabled = false;
+                    scheduledInput.disabled = false;
                     delayedInput.disabled = false;
-                    plannedInput.placeholder = '';
-                    delayedInput.placeholder = '';
-                    plannedInput.style.backgroundColor = '';
-                    delayedInput.style.backgroundColor = '';
                 }
             });
-
-        }
-
-        // Funzione per convertire un orario 'HH:mm' in minuti totali
-        const timeToMinutes = (time) => {
-            if (!time) return null;
-            const [hours, minutes] = time.split(':').map(Number);
-            return (hours * 60) + minutes;
-        };
-
-        // Funzione per verificare se un orario è un "Night Finish"
-        const isNightFinish = (time) => {
-            if (!time) return false;
-            const minutes = timeToMinutes(time);
-            const startNF = timeToMinutes('02:00');
-            const endNF = timeToMinutes('04:59');
-            return minutes >= startNF && minutes <= endNF;
-        };
-
-        // Funzione per verificare i "disruptive duties"
-        const isDisruptiveDuty = (time) => {
-            if (!time) return false;
-            const minutes = timeToMinutes(time);
-            const startDD = timeToMinutes('01:00');
-            const endDD = timeToMinutes('06:59');
-            return minutes >= startDD && minutes <= endDD;
-        };
-
-        // Funzione per ottenere l'orario finale di un giorno (ritardato se presente)
-        const getFinalShiftTime = (dayIndex) => {
-            const delayedInput = document.getElementById(`delayed-shift-${dayIndex}`);
-            const plannedInput = document.getElementById(`planned-shift-${dayIndex}`);
-            // Se il campo è disabilitato (DAY OFF), restituisce una stringa vuota
-            if (plannedInput.disabled) {
-                return '';
-            }
-            return delayedInput.value || plannedInput.value;
-        };
-        
-        // Funzione di verifica principale basata sulle regole fornite
-        const checkShifts = () => {
-            // Include tutti i 7 giorni, inclusi i "Day Off"
-            const allShifts = Array.from({length: 7}, (_, i) => ({ day: i + 1, time: getFinalShiftTime(i + 1) }));
-            const shiftsWithTime = allShifts.filter(s => s.time !== '');
+        });
+        function verifyCompliance() {
+            const results = [];
+            const days = [];
             
-            if (shiftsWithTime.length < 1) {
-                updateResult('legal', 'Non sono stati trovati turni da verificare.');
-                return;
-            }
-
-            // Inizializza l'array per le ragioni legali
-            const legalReasons = [];
-
-            // Verifica delle regole sui "Night Finish"
-            let nightFinishBlocks = [];
-            let currentNFBlockStart = -1;
-
-            for (let i = 0; i < shiftsWithTime.length; i++) {
-                if (isNightFinish(shiftsWithTime[i].time)) {
-                    if (currentNFBlockStart === -1) {
-                        currentNFBlockStart = i;
-                    }
-                } else {
-                    if (currentNFBlockStart !== -1) {
-                        nightFinishBlocks.push({
-                            start: currentNFBlockStart,
-                            end: i - 1,
-                            size: i - currentNFBlockStart
-                        });
-                    }
-                    currentNFBlockStart = -1;
-                }
-            }
-            if (currentNFBlockStart !== -1) {
-                nightFinishBlocks.push({
-                    start: currentNFBlockStart,
-                    end: shiftsWithTime.length - 1,
-                    size: shiftsWithTime.length - currentNFBlockStart
+            // Collect all day data
+            for (let i = 1; i <= 7; i++) {
+                const isDayOff = document.getElementById(`dayoff-${i}`).checked;
+                const scheduled = document.getElementById(`scheduled-${i}`).value;
+                const delayed = document.getElementById(`delayed-${i}`).value;
+                
+                days.push({
+                    day: i,
+                    isDayOff,
+                    scheduled,
+                    delayed,
+                    actualEndTime: delayed || scheduled
                 });
             }
-
-            for (const block of nightFinishBlocks) {
-                if (block.size > 3) {
-                    updateResult('illegal', `Illegale: blocco di ${block.size} turni notturni consecutivi, il limite massimo è 3.`);
-                    return;
+            
+            // Check Night Duties (2 and 3 consecutive)
+            checkNightDuties(days, results);
+            
+            // Check Disruptive Duties (consecutive and total in 7 days)
+            checkDisruptiveDuties(days, results);
+            
+            // Display results
+            displayResults(results);
+        }
+        function checkNightDuties(days, results) {
+            // Find sequences of consecutive night duties
+            for (let i = 0; i < days.length; i++) {
+                if (days[i].isDayOff || !days[i].scheduled) continue;
+                
+                // Check if this is a night duty (based on scheduled time)
+                if (!isNightDuty(days[i].scheduled)) continue;
+                
+                // Find consecutive night duties starting from this day
+                const sequence = [days[i]];
+                let j = i + 1;
+                
+                while (j < days.length && !days[j].isDayOff && days[j].scheduled && isNightDuty(days[j].scheduled)) {
+                    sequence.push(days[j]);
+                    j++;
                 }
                 
-                const precedingDutyIndex = block.start - 1;
-                if (precedingDutyIndex >= 0) {
-                    const precedingDutyDay = shiftsWithTime[precedingDutyIndex].day;
-                    const precedingPlannedTime = document.getElementById(`planned-shift-${precedingDutyDay}`).value;
-                    const precedingDelayedTime = document.getElementById(`delayed-shift-${precedingDutyDay}`).value;
-
-                    if (block.size === 2) {
-                        if (precedingPlannedTime && timeToMinutes(precedingPlannedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingPlannedTime) <= timeToMinutes('04:59')) {
-                            updateResult('illegal', `Illegale: Il giorno (ad es. Giorno ${precedingDutyDay}) precedente ad una serie di 2 night duties non deve terminare oltre le 23:59.`);
-                            return;
-                        }
+                // Check sequence length
+                if (sequence.length >= 2) {
+                    // Get the day before the sequence
+                    const prevDayIndex = i - 1;
+                    
+                    if (prevDayIndex >= 0 && !days[prevDayIndex].isDayOff && days[prevDayIndex].scheduled) {
+                        const prevDayScheduled = days[prevDayIndex].scheduled;
+                        const prevDayActual = days[prevDayIndex].actualEndTime;
                         
-                        if (precedingDelayedTime && timeToMinutes(precedingDelayedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingDelayedTime) <= timeToMinutes('04:59')) {
-                             const illegalMessage = `
-                                    <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE</h3>
-                                    <p class="text-sm font-normal text-red-800 mb-2">
-                                        Il turno precedente ai 2 night duties consecutivi successivi (Giorno ${precedingDutyDay}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
-                                    </p>
-                                    <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">ATTENZIONE</h4>
-                                    <p class="text-sm font-normal text-red-800 mb-2">
-                                        L'assistente di volo potrà effettuare SOLO il primo dei due night duties consecutivi previsti.
-                                    </p>
-                                `;
-                            updateResult('illegal', illegalMessage);
-                            return;
-                        }
-                    } else if (block.size === 3) {
-                        const precedingTimeMinutes = timeToMinutes(getFinalShiftTime(precedingDutyDay));
-                        const precedingPlannedMinutes = timeToMinutes(precedingPlannedTime);
-                        const limitStart = timeToMinutes('21:00');
-                        const limitEnd = timeToMinutes('23:59');
-
-                        if (precedingPlannedTime && precedingPlannedMinutes > limitStart) {
-                             updateResult('illegal', `Illegale: blocco di 3 turni notturni consecutivi. Il turno precedente (Giorno ${precedingDutyDay}) ai tre giorni di night duties non può terminare oltre le ore 21:00`);
-                             return;
-                        }
-
-                        if (precedingDelayedTime && timeToMinutes(precedingDelayedTime) >= timeToMinutes('00:00') && timeToMinutes(precedingDelayedTime) <= timeToMinutes('04:59')) {
-                             const illegalMessage = `
-                                    <h3 class="text-xl font-bold mb-2 text-red-800">TURNO ILLEGALE</h3>
-                                    <p class="text-sm font-normal text-red-800 mb-2">
-                                        Il turno precedente ai 3 night duties consecutivi (Giorno ${precedingDutyDay}) è terminato dopo le 23:59 ora locale a causa di un ritardo.
-                                    </p>
-                                    <h4 class="text-lg font-bold mt-4 mb-2 text-red-800">ATTENZIONE</h4>
-                                    <p class="text-sm font-normal text-red-800 mb-2">
-                                        L'assitente di volo potrà svolgere SOLO il primo dei tre turni notturni consecutivi schedulati.
-                                    </p>
-                                `;
-                             updateResult('illegal', illegalMessage);
-                             return;
-                        } else if (precedingTimeMinutes >= limitStart && precedingTimeMinutes <= limitEnd) {
-                            const specialMessage = `
-                                    <h3 class="text-xl font-bold mb-2 text-yellow-800">ATTENZIONE</h3>
-                                    <p class="text-sm font-normal text-yellow-800 mb-2">
-                                        Il turno precedente ai 3 night duties (Giorno ${precedingDutyDay}) è terminato tra le 21:00 e le 23:59 ora locale.
-                                    </p>
-                                    <h4 class="text-lg font-bold mt-4 mb-2 text-yellow-800">OPZIONI</h4>
-                                    <ul class="list-disc list-inside text-sm font-normal text-yellow-800 text-left">
-                                        <li>Scegliere di <strong>CONTINUARE</strong> con il roster pianificato portando a termine i 3 successivi night duties consecutivi;</li>
-                                        <li>Scegliere di <strong>NON CONTINUARE</strong> con il roster pianificato; in questo caso si dovrà completare solo i primi due night duties consecutivi schedulati.</li>
-                                    </ul>
-                                    <p class="text-sm font-normal text-yellow-800 mt-4 mb-2">
-                                        L'assistente di volo DOVRA' comunicare esplicitamente al comandante la sua intenzione di continuare o meno con il programma.
-                                    </p>
-                                    <p class="text-xs font-normal text-yellow-800 mt-4">
-                                        Sul manuale - <u>OMA 7.4.7.2 Three Consecutive Night Finish Duties paragrafo 1.</u>
-                                    </p>
-                                `;
-                            updateResult('special', specialMessage);
-                            return;
+                        if (sequence.length === 2) {
+                            // Rule for 2 consecutive night duties
+                            const prevScheduledMinutes = timeToMinutes(prevDayScheduled);
+                            const prevActualMinutes = timeToMinutes(prevDayActual);
+                            
+                            // Check if previous day scheduled end is within 23:59
+                            if (prevScheduledMinutes <= 1439) { // 23:59
+                                // But actual end is after 23:59 OR after midnight
+                                if (prevActualMinutes > 1439 || prevActualMinutes < 720) { // After 23:59 or after midnight
+                                    results.push({
+                                        type: 'illegal',
+                                        message: `VIOLAZIONE: 2 night duties consecutivi (Giorni ${sequence.map(d => d.day).join(', ')}) con il giorno precedente (Giorno ${days[prevDayIndex].day}) che termina con orario ritardato oltre le 23:59. DOVREBBE TERMINARE ENTRO LE 23:59. SOLO IL PRIMO DEI DUE NIGHT DUTIES SUCCESSIVI PUO' ESSERE EFFETTUATO.`,
+                                        regulation: 'Night Duties - 2 Consecutivi'
+                                    });
+                                }
+                            } else {
+                                // Previous day scheduled end is after 23:59
+                                results.push({
+                                    type: 'illegal',
+                                    message: `VIOLAZIONE: 2 night duties consecutivi (Giorni ${sequence.map(d => d.day).join(', ')}) con il giorno precedente (Giorno ${days[prevDayIndex].day}) che termina con orario previsto oltre le 23:59. DOVREBBE TERMINARE ENTRO LE 23:59.`,
+                                    regulation: 'Night Duties - 2 Consecutivi'
+                                });
+                            }
+                        } else if (sequence.length >= 3) {
+                            // Rule for 3 consecutive night duties
+                            const prevScheduledMinutes = timeToMinutes(prevDayScheduled);
+                            const prevActualMinutes = timeToMinutes(prevDayActual);
+                            
+                            // Check if previous day scheduled end is within 21:00
+                            if (prevScheduledMinutes <= 1260) { // 21:00
+                                // But actual end is after 21:00
+                                if (prevActualMinutes > 1260 || prevActualMinutes < 720) { // After 21:00 or after midnight
+                                    if (prevActualMinutes <= 1439 && prevActualMinutes >= 1260) { // Between 21:00 and 23:59
+                                        results.push({
+                                            type: 'warning',
+                                            message: `ATTENZIONE: 3 night duties consecutivi (Giorni ${sequence.map(d => d.day).join(', ')}) con il giorno precedente (Giorno ${days[prevDayIndex].day}) che termina con orario ritardato tra le 21:00 e le 23:59. DOVREBBE TERMINARE ENTRO LE 21:00. L'ASSISTENTE DI VOLO DOVRA' DECIDERE: 1) Se non proseguire, potrà effettuare SOLO il primo ed il secondo dei night duties programmati. 2) La programmazione dei 3 giorni successivi può continuare.`,
+                                            regulation: 'Night Duties - 3 Consecutivi'
+                                        });
+                                    } else { // After 23:59 or after midnight
+                                        results.push({
+                                            type: 'illegal',
+                                            message: `VIOLAZIONE: 3 night duties consecutivi (Giorni ${sequence.map(d => d.day).join(', ')}) con il giorno precedente (Giorno ${days[prevDayIndex].day}) che termina con orario ritardato oltre le 23:59. DOVREBBE TERMINARE ENTRO LE 21:00. L'assistente di volo DOVRA' completare solo il primo dei tre night duties previsti.`,
+                                            regulation: 'Night Duties - 3 Consecutivi'
+                                        });
+                                    }
+                                }
+                            } else {
+                                // Previous day scheduled end is after 21:00
+                                results.push({
+                                    type: 'illegal',
+                                    message: `VIOLAZIONE: 3 night duties consecutivi (Giorni ${sequence.map(d => d.day).join(', ')}) con il giorno precedente (Giorno ${days[prevDayIndex].day}) che termina con orario previsto oltre le 21:00. DOVREBBE TERMINARE ENTRO LE 21:00.`,
+                                    regulation: 'Night Duties - 3 Consecutivi'
+                                });
+                            }
                         }
                     }
+                    
+                    // Skip the sequence we just processed
+                    i = j - 1;
                 }
             }
-
-            legalReasons.push("Non sono stati trovati blocchi illegali di <b>Night Finish Duties</b>.");
-
-            // --- CONTROLLO DEI DISRUPTIVE DUTIES CONSECUTIVI ---
-            let consecutiveDisruptiveCount = 0;
-            let disruptiveDaysInBlock = [];
+        }
+        function checkDisruptiveDuties(days, results) {
+            // Check consecutive disruptive duties
+            let consecutiveCount = 0;
+            let consecutiveDays = [];
+            let hasConsecutiveViolation = false;
             
-            for (let i = 0; i < allShifts.length; i++) {
-                if (isDisruptiveDuty(allShifts[i].time)) {
-                    consecutiveDisruptiveCount++;
-                    disruptiveDaysInBlock.push(allShifts[i].day);
+            days.forEach(day => {
+                if (!day.isDayOff && day.actualEndTime && isDisruptiveDuty(day.actualEndTime)) {
+                    consecutiveCount++;
+                    consecutiveDays.push(day.day);
+                    
+                    if (consecutiveCount > 3) {
+                        hasConsecutiveViolation = true;
+                        results.push({
+                            type: 'illegal',
+                            message: `VIOLAZIONE: Più di 3 disruptive duties consecutivi. Sequenza: Giorno ${consecutiveDays.join(', Giorno ')}. DOVREBBERO ESSERE MASSIMO 3 CONSECUTIVI.`,
+                            regulation: 'Disruptive Duties - Consecutivi'
+                        });
+                    }
                 } else {
-                    if (consecutiveDisruptiveCount > 3) {
-                        const daysString = disruptiveDaysInBlock.map(day => `Giorno ${day}`).join(', ');
-                        const illegalMessage = `
-                            <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
-                            <p class="text-sm font-normal text-red-800 mb-2">
-                                Hai un blocco di ${consecutiveDisruptiveCount} turni "disruptive" consecutivi, il limite massimo è 3.
-                            </p>
-                            <p class="text-sm font-normal text-red-800 mt-2 mb-2">
-                                I giorni interessati sono: ${daysString}.
-                            </p>
-                        `;
-                        updateResult('illegal', illegalMessage);
-                        return;
+                    consecutiveCount = 0;
+                    consecutiveDays = [];
+                }
+            });
+            
+            // Check total disruptive duties in 7 days
+            const totalDisruptiveDays = [];
+            days.forEach(day => {
+                if (!day.isDayOff && day.actualEndTime && isDisruptiveDuty(day.actualEndTime)) {
+                    totalDisruptiveDays.push(day.day);
+                }
+            });
+            
+            if (totalDisruptiveDays.length > 4) {
+                results.push({
+                    type: 'illegal',
+                    message: `VIOLAZIONE: Oltre 4 disruptive duties in 7 giorni. Totale: ${totalDisruptiveDays.length} (limite: 4). Giorni con disruptive duties: Giorno ${totalDisruptiveDays.join(', Giorno ')}. DOVREBBERO ESSERE MASSIMO 4 IN 7 GIORNI.`,
+                    regulation: 'Disruptive Duties - Totale 7 giorni'
+                });
+            } else if (totalDisruptiveDays.length === 4 && !hasConsecutiveViolation) {
+                // Check if the 4 disruptive duties are all consecutive
+                const sortedDays = [...totalDisruptiveDays].sort((a, b) => a - b);
+                let allConsecutive = true;
+                
+                for (let i = 1; i < sortedDays.length; i++) {
+                    if (sortedDays[i] !== sortedDays[i-1] + 1) {
+                        allConsecutive = false;
+                        break;
                     }
-                    consecutiveDisruptiveCount = 0;
-                    disruptiveDaysInBlock.length = 0;
+                }
+                
+                if (allConsecutive) {
+                    results.push({
+                        type: 'illegal',
+                        message: `VIOLAZIONE: 4 disruptive duties in 7 giorni sono tutti consecutivi (Giorni ${totalDisruptiveDays.join(', Giorno ')}). SE SONO 4 NON DEVONO ESSERE CONSECUTIVI.`,
+                        regulation: 'Disruptive Duties - 4 Consecutivi'
+                    });
                 }
             }
+        }
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return null;
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+        function isNightDuty(timeStr) {
+            const minutes = timeToMinutes(timeStr);
+            if (!minutes) return false;
+            return minutes >= 120 && minutes <= 299; // 02:00 to 04:59
+        }
+        function isDisruptiveDuty(timeStr) {
+            const minutes = timeToMinutes(timeStr);
+            if (!minutes) return false;
+            return minutes >= 60 && minutes <= 405; // 01:00 to 06:45
+        }
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            resultsDiv.classList.remove('hidden');
             
-            // Controllo finale per un blocco consecutivo che termina l'array
-            if (consecutiveDisruptiveCount > 3) {
-                const daysString = disruptiveDaysInBlock.map(day => `Giorno ${day}`).join(', ');
-                const illegalMessage = `
-                    <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
-                    <p class="text-sm font-normal text-red-800 mb-2">
-                        Hai un blocco di ${consecutiveDisruptiveCount} turni "disruptive" consecutivi, il limite massimo è 3.
-                    </p>
-                    <p class="text-sm font-normal text-red-800 mt-2 mb-2">
-                        I giorni interessati sono: ${daysString}.
-                    </p>
+            if (results.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="result-enter bg-green-100 border-2 border-green-400 rounded-lg p-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 text-3xl mr-3"></i>
+                            <div>
+                                <h3 class="text-xl font-semibold text-green-800">Il turno è legale</h3>
+                                <p class="mt-2 text-green-700">Tutte le normative Easyjet sono state rispettate.</p>
+                            </div>
+                        </div>
+                    </div>
                 `;
-                updateResult('illegal', illegalMessage);
-                return;
+            } else {
+                results.forEach(result => {
+                    let bgColor, borderColor, textColor, icon;
+                    
+                    if (result.type === 'illegal') {
+                        bgColor = 'bg-red-100';
+                        borderColor = 'border-red-400';
+                        textColor = 'text-red-800';
+                        icon = '<i class="fas fa-exclamation-circle text-red-600 result-icon"></i>';
+                    } else if (result.type === 'warning') {
+                        bgColor = 'bg-yellow-100';
+                        borderColor = 'border-yellow-400';
+                        textColor = 'text-yellow-800';
+                        icon = '<i class="fas fa-exclamation-triangle text-yellow-600 result-icon"></i>';
+                    }
+                    
+                    // Format the message for better readability
+                    let formattedMessage = result.message;
+                    if (result.regulation === 'Night Duties - 3 Consecutivi' && result.type === 'warning') {
+                        // Extract the information from the message
+                        const match = result.message.match(/ATTENZIONE: 3 night duties consecutivi \(Giorni (.+?)\) con il giorno precedente \(Giorno (.+?)\) che termina con orario ritardato tra le 21:00 e le 23:59\. DOVREBBE TERMINARE ENTRO LE 21:00\. L'ASSISTENTE DI VOLO DOVRA' DECIDERE: 1\) Se non proseguire, potrà effettuare SOLO il primo ed il secondo dei night duties programmati\. 2\) La programmazione dei 3 giorni successivi può continuare\./);
+                        
+                        if (match) {
+                            const sequenceDays = match[1];
+                            const prevDay = match[2];
+                            
+                            formattedMessage = `
+                                <div class="message-content">
+                                    <p class="mb-3"><strong>3 night duties consecutivi</strong> (Giorni ${sequenceDays}) con il giorno precedente (Giorno ${prevDay}) che termina con orario ritardato tra le 21:00 e le 23:59.</p>
+                                    
+                                    <div class="warning-point mt-4">
+                                        <p class="font-semibold"><strong>DOVREBBE TERMINARE ENTRO LE 21:00.</strong></p>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <p class="font-semibold"><strong>L'ASSISTENTE DI VOLO DOVRA' DECIDERE:</strong></p>
+                                        <ul class="option-list mt-3">
+                                            <li><strong>Se non proseguire</strong>: potrà effettuare <strong>SOLO il primo ed il secondo</strong> dei night duties programmati</li>
+                                            <li><strong>Se continua</strong>: la programmazione dei 3 giorni successivi <strong>può continuare</strong></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else if (result.message.includes('2 night duties consecutivi')) {
+                        // Format for 2 consecutive night duties
+                        const match = result.message.match(/VIOLAZIONE: 2 night duties consecutivi \(Giorni (.+?)\) con il giorno precedente \(Giorno (.+?)\) che termina con orario (.+?) oltre le 23:59\. (.+)\./);
+                        
+                        if (match) {
+                            const sequenceDays = match[1];
+                            const prevDay = match[2];
+                            const scheduleType = match[3];
+                            const consequence = match[4];
+                            
+                            formattedMessage = `
+                                <div class="message-content">
+                                    <p class="mb-3"><strong>2 night duties consecutivi</strong> (Giorni ${sequenceDays}) con il giorno precedente (Giorno ${prevDay}) che termina con orario ${scheduleType} oltre le 23:59.</p>
+                                    
+                                    <div class="violation-point mt-4">
+                                        <p class="font-semibold"><strong>DOVREBBE TERMINARE ENTRO LE 23:59.</strong></p>
+                                    </div>
+                                    
+                                    <div class="mt-4 p-3 bg-red-50 rounded-md">
+                                        <p class="font-semibold text-red-700"><strong>CONSEGUENZA:</strong></p>
+                                        <p class="mt-2">${consequence}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else if (result.message.includes('3 night duties consecutivi') && result.type === 'illegal') {
+                        // Format for 3 consecutive night duties - illegal
+                        const match = result.message.match(/VIOLAZIONE: 3 night duties consecutivi \(Giorni (.+?)\) con il giorno precedente \(Giorno (.+?)\) che termina con orario (.+?) oltre le (.+?)\. (.+)\./);
+                        
+                        if (match) {
+                            const sequenceDays = match[1];
+                            const prevDay = match[2];
+                            const scheduleType = match[3];
+                            const timeLimit = match[4];
+                            const consequence = match[5];
+                            
+                            formattedMessage = `
+                                <div class="message-content">
+                                    <p class="mb-3"><strong>3 night duties consecutivi</strong> (Giorni ${sequenceDays}) con il giorno precedente (Giorno ${prevDay}) che termina con orario ${scheduleType} oltre le ${timeLimit}.</p>
+                                    
+                                    <div class="violation-point mt-4">
+                                        <p class="font-semibold"><strong>DOVREBBE TERMINARE ENTRO LE 21:00.</strong></p>
+                                    </div>
+                                    
+                                    <div class="mt-4 p-3 bg-red-50 rounded-md">
+                                        <p class="font-semibold text-red-700"><strong>CONSEGUENZA:</strong></p>
+                                        <p class="mt-2">${consequence}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else if (result.message.includes('disruptive duties consecutivi')) {
+                        // Format for disruptive duties consecutive
+                        const match = result.message.match(/VIOLAZIONE: Più di 3 disruptive duties consecutivi\. Sequenza: Giorno (.+?)\. (.+)\./);
+                        
+                        if (match) {
+                            const sequenceDays = match[1];
+                            const rule = match[2];
+                            
+                            formattedMessage = `
+                                <div class="message-content">
+                                    <p class="mb-3"><strong>Violazione limite disruptive duties consecutivi</strong></p>
+                                    
+                                    <div class="violation-point mt-4">
+                                        <p><strong>Sequenza identificata:</strong> Giorno ${sequenceDays}</p>
+                                        <p class="mt-2"><strong>Limite superato:</strong> Più di 3 consecutivi</p>
+                                    </div>
+                                    
+                                    <div class="mt-4 p-3 bg-red-50 rounded-md">
+                                        <p class="font-semibold text-red-700"><strong>REGOLA:</strong></p>
+                                        <p class="mt-2">${rule}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else if (result.message.includes('disruptive duties in 7 giorni')) {
+                        // Format for disruptive duties total in 7 days
+                        const match = result.message.match(/VIOLAZIONE: (.+?) Totale: (.+?) \(limite: (.+?)\. Giorni con disruptive duties: Giorno (.+?)\. (.+)\./);
+                        
+                        if (match) {
+                            const violationType = match[1];
+                            const total = match[2];
+                            const limit = match[3];
+                            const days = match[4];
+                            const rule = match[5];
+                            
+                            formattedMessage = `
+                                <div class="message-content">
+                                    <p class="mb-3"><strong>${violationType}</strong></p>
+                                    
+                                    <div class="violation-point mt-4">
+                                        <p><strong>Totale disruptive duties:</strong> ${total}</p>
+                                        <p class="mt-2"><strong>Limite consentito:</strong> ${limit}</p>
+                                        <p class="mt-2"><strong>Giorni coinvolti:</strong> Giorno ${days}</p>
+                                    </div>
+                                    
+                                    <div class="mt-4 p-3 bg-red-50 rounded-md">
+                                        <p class="font-semibold text-red-700"><strong>REGOLA:</strong></p>
+                                        <p class="mt-2">${rule}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } else if (result.message.includes('4 disruptive duties in 7 giorni sono tutti consecutivi')) {
+                        // Format for 4 consecutive disruptive duties
+                        const match = result.message.match(/VIOLAZIONE: 4 disruptive duties in 7 giorni sono tutti consecutivi \(Giorni (.+?)\)\. (.+)\./);
+                        
+                        if (match) {
+                            const days = match[1];
+                            const rule = match[2];
+                            
+                            formattedMessage = `
+                                <div class="message-content">
+                                    <p class="mb-3"><strong>4 disruptive duties consecutivi non consentiti</strong></p>
+                                    
+                                    <div class="violation-point mt-4">
+                                        <p><strong>Giorni coinvolti:</strong> Giorno ${days}</p>
+                                    </div>
+                                    
+                                    <div class="mt-4 p-3 bg-red-50 rounded-md">
+                                        <p class="font-semibold text-red-700"><strong>REGOLA SPECIALE:</strong></p>
+                                        <p class="mt-2">${rule}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    const resultHtml = `
+                        <div class="result-enter ${bgColor} ${borderColor} result-card p-6 mb-4">
+                            <div class="flex items-start">
+                                ${icon}
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold ${textColor} mb-4">${result.type === 'illegal' ? 'VIOLAZIONE' : 'ATTENZIONE'}</h3>
+                                    <div class="text-base ${textColor.replace('800', '700')}">${formattedMessage}</div>
+                                    <div class="mt-4 pt-3 border-t border-gray-200">
+                                        <p class="text-sm ${textColor.replace('800', '600')} font-medium">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            Regolazione: ${result.regulation}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultsDiv.innerHTML += resultHtml;
+                });
             }
-
-            legalReasons.push("Non sono stati trovati blocchi illegali di turni <b>disruptive consecutivi</b> (massimo 3).");
-
-
-            // Ora controlla il totale dei disruptive duties in 7 giorni
-            const disruptiveDays = allShifts.filter(s => isDisruptiveDuty(s.time));
-            const totalDisruptiveCount = disruptiveDays.length;
-
-            if (totalDisruptiveCount > 4) {
-                const disruptiveDaysString = disruptiveDays.map(day => `Giorno ${day.day}`).join(', ');
-                const illegalMessage = `
-                            <h3 class="text-xl font-bold mb-2 text-red-800">ILLEGALE</h3>
-                            <p class="text-sm font-normal text-red-800 mb-2">
-                                Sono presenti ${totalDisruptiveCount} "disruptive" duties in 7 giorni, il limite massimo è 4.
-                            </p>
-                            <p class="text-sm font-normal text-red-800 mt-2 mb-2">
-                                I giorni interessati sono: ${disruptiveDaysString}.
-                            </p>
-                        `;
-                updateResult('illegal', illegalMessage);
-                return;
-            }
-
-            legalReasons.push(`Il numero totale di turni <b>disruptive</b> in 7 giorni (${totalDisruptiveCount}) è conforme alla normativa (massimo 4).`);
-            
-            // Se tutto è andato bene, il turno è legale
-            updateResult('legal', `
-                <h3 class="text-xl font-bold mb-2 text-green-800">TURNO LEGALE</h3>
-                <p class="text-sm font-normal text-green-800 mb-2">
-                    La pianificazione del turno è conforme a tutte le normative verificate.
-                </p>
-                <ul class="list-disc list-inside text-sm font-normal text-green-800 text-left mt-4">
-                    ${legalReasons.map(reason => `<li>${reason}</li>`).join('')}
-                </ul>
-            `);
-        };
-
-        const updateResult = (status, message) => {
-            resultBox.classList.remove('result-legal', 'result-illegal', 'result-special', 'opacity-0', 'scale-95');
-            resultBox.innerHTML = '';
-            
-            if (status === 'legal') {
-                resultBox.classList.add('result-legal');
-                resultBox.innerHTML = message;
-            } else if (status === 'illegal') {
-                resultBox.classList.add('result-illegal');
-                resultBox.innerHTML = message;
-            } else if (status === 'special') {
-                resultBox.classList.add('result-special');
-                resultBox.innerHTML = message;
-            }
-            
-            resultBox.classList.remove('opacity-0', 'scale-95');
-            resultBox.classList.add('opacity-100', 'scale-100');
-        };
-
-        verifyBtn.addEventListener('click', checkShifts);
-
-        clearBtn.addEventListener('click', () => {
-            for (let i = 1; i <= 7; i++) {
-                const plannedInput = document.getElementById(`planned-shift-${i}`);
-                const delayedInput = document.getElementById(`delayed-shift-${i}`);
-                const offCheckbox = document.getElementById(`off-day-${i}`);
-
-                plannedInput.value = '';
-                delayedInput.value = '';
-                offCheckbox.checked = false;
-                plannedInput.disabled = false;
-                delayedInput.disabled = false;
-                plannedInput.placeholder = '';
-                delayedInput.placeholder = '';
-                plannedInput.style.backgroundColor = '';
-                delayedInput.style.backgroundColor = '';
-            }
-            
-            resultBox.classList.remove('opacity-100', 'scale-100', 'result-legal', 'result-illegal', 'result-special');
-            resultBox.classList.add('opacity-0', 'scale-95');
-            resultBox.innerHTML = '';
-        });
-
-        // Aggiungi un listener per ogni input per abilitare la verifica
-        const inputs = shiftInputsContainer.querySelectorAll('input[type="time"]');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                // Rimuovi lo stato del risultato quando l'utente modifica un campo
-                resultBox.classList.remove('opacity-100', 'scale-100', 'result-legal', 'result-illegal', 'result-special');
-                resultBox.classList.add('opacity-0', 'scale-95');
-            });
-        });
+        }
     </script>
 </body>
 </html>
