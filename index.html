@@ -140,59 +140,76 @@
             border-radius: 0.25rem;
         }
         
-        /* Responsive styles */
+        /* Enhanced Responsive styles */
         @media (max-width: 768px) {
             .header-bg {
                 padding: 1rem;
+                margin-bottom: 1rem;
             }
             
             h1 {
                 font-size: 1.5rem !important;
+                line-height: 1.2 !important;
             }
             
             p {
                 font-size: 0.875rem !important;
+                line-height: 1.4 !important;
             }
             
             .day-section {
                 flex-direction: column;
                 align-items: flex-start !important;
                 padding: 1rem !important;
+                margin-bottom: 1rem !important;
+                border-radius: 0.75rem !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
             }
             
             .day-header {
                 width: 100% !important;
-                margin-bottom: 0.5rem;
-                font-size: 1rem !important;
+                margin-bottom: 0.75rem !important;
+                font-size: 1.1rem !important;
+                text-align: center !important;
+                padding-bottom: 0.5rem !important;
+                border-bottom: 2px dashed #e5e7eb !important;
             }
             
             .flex-1 {
                 width: 100% !important;
                 min-width: 100% !important;
-                margin-bottom: 0.75rem;
+                margin-bottom: 1rem !important;
             }
             
             .flex.items-center {
                 width: 100% !important;
-                margin-bottom: 0.75rem;
-                justify-content: flex-start !important;
+                margin-bottom: 1rem !important;
+                justify-content: center !important;
+                padding: 0.75rem !important;
+                background-color: #f9fafb !important;
+                border-radius: 0.5rem !important;
             }
             
             .gradient-button {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
+                padding: 1rem 2rem !important;
+                font-size: 1.1rem !important;
+                width: 100% !important;
+                max-width: 280px !important;
             }
             
             .main-container {
                 padding: 1rem !important;
+                margin: 0 0.5rem !important;
             }
             
             .verify-section {
-                padding: 1rem;
+                padding: 1.5rem !important;
+                margin: 1.5rem 0 !important;
             }
             
             .result-card {
                 padding: 1rem !important;
+                margin-bottom: 1rem !important;
             }
             
             .result-icon {
@@ -201,14 +218,96 @@
             
             footer {
                 padding: 1rem 0 !important;
+                margin-top: 2rem !important;
+            }
+            
+            label {
+                font-weight: 600 !important;
+                color: #4b5563 !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            input[type="time"] {
+                padding: 0.75rem !important;
+                font-size: 1rem !important;
+                border-radius: 0.5rem !important;
+                border: 2px solid #d1d5db !important;
+            }
+            
+            input[type="checkbox"] {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+                margin-right: 0.5rem !important;
+            }
+            
+            .option-list {
+                margin-left: 1rem !important;
+                margin-top: 0.75rem !important;
+            }
+            
+            .option-list li {
+                margin-bottom: 1rem !important;
+                padding-left: 0.25rem !important;
+                line-height: 1.5 !important;
+            }
+            
+            .option-list li::before {
+                left: -1.25rem !important;
+            }
+            
+            .violation-point, .warning-point {
+                padding: 1rem !important;
+                margin: 0.75rem 0 !important;
+                border-radius: 0.5rem !important;
+            }
+            
+            .message-content {
+                font-size: 0.95rem !important;
+            }
+            
+            .result-card h3 {
+                font-size: 1.25rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .result-card .text-base {
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        /* Very small screens (iPhone SE, etc.) */
+        @media (max-width: 375px) {
+            .day-header {
+                font-size: 1rem !important;
+            }
+            
+            h1 {
+                font-size: 1.25rem !important;
+            }
+            
+            p {
+                font-size: 0.8rem !important;
+            }
+            
+            .gradient-button {
+                font-size: 1rem !important;
+                padding: 0.875rem 1.5rem !important;
+            }
+            
+            input[type="time"] {
+                font-size: 0.875rem !important;
+            }
+            
+            label {
+                font-size: 0.8rem !important;
             }
         }
     </style>
 </head>
 <body class="flex flex-col">
-    <div class="container mx-auto px-4 py-6 md:py-8 max-w-6xl flex-1">
+    <div class="container mx-auto px-3 py-4 md:py-6 md:px-4 max-w-6xl flex-1">
         <!-- Header -->
-        <header class="text-center mb-6 md:mb-8">
+        <header class="text-center mb-4 md:mb-6">
             <div class="header-bg">
                 <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-3">Night and Disruptive Duties</h1>
                 <p class="text-sm md:text-base opacity-90 max-w-3xl mx-auto">
@@ -220,13 +319,13 @@
             </div>
         </header>
         <!-- Main Content -->
-        <main class="main-container p-4 md:p-6 lg:p-8">
+        <main class="main-container p-3 md:p-4 lg:p-6">
             <!-- Days Grid - Now vertical layout -->
-            <div class="space-y-4 mb-6 md:mb-8">
+            <div class="space-y-3 md:space-y-4 mb-4 md:mb-6">
                 <!-- Day 1 -->
-                <div class="day-section day-1 bg-gray-50 rounded-lg p-4 flex items-center" data-day="1">
+                <div class="day-section day-1 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="1">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 1</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-1">
@@ -242,9 +341,9 @@
                     </div>
                 </div>
                 <!-- Day 2 -->
-                <div class="day-section day-2 bg-gray-50 rounded-lg p-4 flex items-center" data-day="2">
+                <div class="day-section day-2 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="2">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 2</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-2">
@@ -260,9 +359,9 @@
                     </div>
                 </div>
                 <!-- Day 3 -->
-                <div class="day-section day-3 bg-gray-50 rounded-lg p-4 flex items-center" data-day="3">
+                <div class="day-section day-3 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="3">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 3</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-3">
@@ -278,9 +377,9 @@
                     </div>
                 </div>
                 <!-- Day 4 -->
-                <div class="day-section day-4 bg-gray-50 rounded-lg p-4 flex items-center" data-day="4">
+                <div class="day-section day-4 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="4">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 4</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-4">
@@ -296,9 +395,9 @@
                     </div>
                 </div>
                 <!-- Day 5 -->
-                <div class="day-section day-5 bg-gray-50 rounded-lg p-4 flex items-center" data-day="5">
+                <div class="day-section day-5 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="5">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 5</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-5">
@@ -314,9 +413,9 @@
                     </div>
                 </div>
                 <!-- Day 6 -->
-                <div class="day-section day-6 bg-gray-50 rounded-lg p-4 flex items-center" data-day="6">
+                <div class="day-section day-6 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="6">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 6</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-6">
@@ -332,9 +431,9 @@
                     </div>
                 </div>
                 <!-- Day 7 -->
-                <div class="day-section day-7 bg-gray-50 rounded-lg p-4 flex items-center" data-day="7">
+                <div class="day-section day-7 bg-gray-50 rounded-lg p-3 md:p-4 flex items-center" data-day="7">
                     <div class="w-16 md:w-24 day-header text-base md:text-lg">Giorno 7</div>
-                    <div class="flex-1 flex flex-col md:flex-row gap-3 md:gap-4">
+                    <div class="flex-1 flex flex-col md:flex-row gap-2 md:gap-4">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-medium text-gray-600 mb-1">Orario Previsto</label>
                             <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="scheduled-7">
@@ -364,8 +463,8 @@
         </main>
     </div>
     <!-- Footer with Disclaimer -->
-    <footer class="bg-gray-800 text-gray-300 py-4 md:py-6 mt-8">
-        <div class="container mx-auto px-4 text-center">
+    <footer class="bg-gray-800 text-gray-300 py-3 md:py-4 mt-6 md:mt-8">
+        <div class="container mx-auto px-3 md:px-4 text-center">
             <p class="text-xs md:text-sm">
                 © 2025 verifica-night-disruptive-duties.netlify.app – Tutti i diritti riservati. Il design, il codice e i contenuti di questa web app sono protetti da copyright. È vietata la riproduzione o diffusione non autorizzata, anche parziale, senza esplicita autorizzazione.
             </p>
