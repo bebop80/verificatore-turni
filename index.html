@@ -152,6 +152,22 @@
             overflow-wrap: break-word;
         }
         
+        .risk-point {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0.25rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .risk-highlight {
+            border-left: 4px solid #f59e0b !important;
+            background-color: rgba(245, 158, 11, 0.1) !important;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+        
         /* Enhanced Responsive styles */
         @media (max-width: 768px) {
             .header-bg {
@@ -273,7 +289,7 @@
                 left: -1.25rem !important;
             }
             
-            .violation-point, .warning-point {
+            .violation-point, .warning-point, .risk-point {
                 padding: 1rem !important;
                 margin: 0.75rem 0 !important;
                 border-radius: 0.5rem !important;
@@ -504,6 +520,11 @@
             <div id="results" class="hidden">
                 <!-- Results will be dynamically inserted here -->
             </div>
+            <!-- Risk Results Area -->
+            <div id="risk-results" class="hidden mt-6">
+                <h2 class="text-xl font-bold text-orange-800 mb-4">Turni a Rischio</h2>
+                <!-- Risk results will be dynamically inserted here -->
+            </div>
         </main>
     </div>
     <!-- Footer with Disclaimer -->
@@ -533,8 +554,15 @@
                 }
             });
         });
+        
         function verifyCompliance() {
+            // Remove any previous risk highlights
+            document.querySelectorAll('.day-section').forEach(day => {
+                day.classList.remove('risk-highlight');
+            });
+            
             const results = [];
+            const riskResults = [];
             const days = [];
             
             // Collect all day data
@@ -558,9 +586,30 @@
             // Check Disruptive Duties (consecutive and total in 7 days)
             checkDisruptiveDuties(days, results);
             
+            // Check for risk cases
+            checkRiskCases(days, riskResults);
+            
             // Display results
             displayResults(results);
+            
+            // Display risk results if any
+            if (riskResults.length > 0) {
+                displayRiskResults(riskResults);
+                
+                // Highlight risk days
+                riskResults.forEach(risk => {
+                    if (risk.riskDay) {
+                        const dayElement = document.querySelector(`.day-section[data-day="${risk.riskDay}"]`);
+                        if (dayElement) {
+                            dayElement.classList.add('risk-highlight');
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('risk-results').classList.add('hidden');
+            }
         }
+        
         function checkNightDuties(days, results) {
             // Find sequences of consecutive night duties
             for (let i = 0; i < days.length; i++) {
@@ -649,6 +698,7 @@
                 }
             }
         }
+        
         function checkDisruptiveDuties(days, results) {
             // Check consecutive disruptive duties
             let consecutiveCount = 0;
@@ -709,21 +759,122 @@
                 }
             }
         }
+        
+        function checkRiskCases(days, riskResults) {
+            // Check for 2 consecutive night duties risk
+            for (let i = 0; i < days.length; i++) {
+                if (days[i].isDayOff || !days[i].scheduled) continue;
+                
+                // Check if this is a night duty
+                if (!isNightDuty(days[i].scheduled)) continue;
+                
+                // Find consecutive night duties starting from this day
+                const sequence = [days[i]];
+                let j = i + 1;
+                
+                while (j < days.length && !days[j].isDayOff && days[j].scheduled && isNightDuty(days[j].scheduled)) {
+                    sequence.push(days[j]);
+                    j++;
+                }
+                
+                // Check for 2 consecutive night duties
+                if (sequence.length === 2) {
+                    // Get the day before the sequence
+                    const prevDayIndex = i - 1;
+                    if (prevDayIndex >= 0 && !days[prevDayIndex].isDayOff && days[prevDayIndex].scheduled) {
+                        // Use delayed time if available, otherwise use scheduled time
+                        const prevDayTime = days[prevDayIndex].delayed || days[prevDayIndex].scheduled;
+                        const prevDayMinutes = timeToMinutes(prevDayTime);
+                        
+                        // Check if previous day end time is between 23:29 and 23:59
+                        if (prevDayMinutes >= 1409 && prevDayMinutes <= 1439) { // 23:29 to 23:59
+                            riskResults.push({
+                                type: 'risk',
+                                message: `ATTENZIONE: Il giorno precedente (Giorno ${days[prevDayIndex].day}) ai 2 night duties consecutivi (Giorni ${sequence.map(d => d.day).join(', ')}) è a rischio. Un eventuale ritardo oltre le 23:59 comporterebbe la violazione della regolamentazione, costringendo a svolgere solo il primo dei due night duties.`,
+                                riskDay: days[prevDayIndex].day
+                            });
+                        }
+                    }
+                }
+                // Check for 3 consecutive night duties
+                else if (sequence.length >= 3) {
+                    // Get the day before the sequence
+                    const prevDayIndex = i - 1;
+                    if (prevDayIndex >= 0 && !days[prevDayIndex].isDayOff && days[prevDayIndex].scheduled) {
+                        // Use delayed time if available, otherwise use scheduled time
+                        const prevDayTime = days[prevDayIndex].delayed || days[prevDayIndex].scheduled;
+                        const prevDayMinutes = timeToMinutes(prevDayTime);
+                        
+                        // Check if previous day end time is between 20:30 and 21:00
+                        if (prevDayMinutes >= 1230 && prevDayMinutes <= 1260) { // 20:30 to 21:00
+                            riskResults.push({
+                                type: 'risk',
+                                message: `ATTENZIONE: Il giorno precedente (Giorno ${days[prevDayIndex].day}) ai 3 night duties consecutivi (Giorni ${sequence.slice(0,3).map(d => d.day).join(', ')}) è a rischio. Un eventuale ritardo oltre le 21:00 comporterebbe la necessità di decidere se proseguire o meno con la programmazione. In caso di ritardo oltre le 23:59, si potrebbe svolgere solo il primo dei tre night duties.`,
+                                riskDay: days[prevDayIndex].day
+                            });
+                        }
+                    }
+                }
+                
+                // Skip the sequence we just processed
+                i = j - 1;
+            }
+            
+            // Check for disruptive duties risks
+            // 1. 3 consecutive disruptive duties (risk of becoming 4)
+            let consecutiveCount = 0;
+            let consecutiveDays = [];
+            for (let i = 0; i < days.length; i++) {
+                if (!days[i].isDayOff && days[i].actualEndTime && isDisruptiveDuty(days[i].actualEndTime)) {
+                    consecutiveCount++;
+                    consecutiveDays.push(days[i].day);
+                    
+                    if (consecutiveCount === 3) {
+                        riskResults.push({
+                            type: 'risk',
+                            message: `ATTENZIONE: Sono presenti 3 disruptive duties consecutive (Giorni ${consecutiveDays.join(', ')}). Questo è a rischio perché non è consentito avere più di 3 disruptive duties consecutivi. Un ulteriore disruptive duty consecutivo violerebbe la regolamentazione.`
+                        });
+                    }
+                } else {
+                    consecutiveCount = 0;
+                    consecutiveDays = [];
+                }
+            }
+            
+            // 2. 4 disruptive duties in 7 days (or less) - non consecutive
+            const totalDisruptiveDays = [];
+            days.forEach(day => {
+                if (!day.isDayOff && day.actualEndTime && isDisruptiveDuty(day.actualEndTime)) {
+                    totalDisruptiveDays.push(day.day);
+                }
+            });
+            
+            if (totalDisruptiveDays.length === 4) {
+                riskResults.push({
+                    type: 'risk',
+                    message: `ATTENZIONE: Sono già presenti 4 disruptive duties in ${days.length} giorni (Giorni ${totalDisruptiveDays.join(', ')}). Questo è a rischio perché non è consentito avere più di 4 disruptive duties in 7 giorni. Ulteriori disruptive duties violerebbero la regolamentazione.`
+                });
+            }
+        }
+        
         function timeToMinutes(timeStr) {
             if (!timeStr) return null;
             const [hours, minutes] = timeStr.split(':').map(Number);
             return hours * 60 + minutes;
         }
+        
         function isNightDuty(timeStr) {
             const minutes = timeToMinutes(timeStr);
             if (!minutes) return false;
             return minutes >= 120 && minutes <= 299; // 02:00 to 04:59
         }
+        
         function isDisruptiveDuty(timeStr) {
             const minutes = timeToMinutes(timeStr);
             if (!minutes) return false;
             return minutes >= 60 && minutes <= 405; // 01:00 to 06:45
         }
+        
         function displayResults(results) {
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
@@ -935,6 +1086,32 @@
                     resultsDiv.innerHTML += resultHtml;
                 });
             }
+        }
+        
+        function displayRiskResults(riskResults) {
+            const riskResultsDiv = document.getElementById('risk-results');
+            riskResultsDiv.innerHTML = '<h2 class="text-xl font-bold text-orange-800 mb-4">Turni a Rischio</h2>';
+            riskResultsDiv.classList.remove('hidden');
+            
+            riskResults.forEach(risk => {
+                const resultHtml = `
+                    <div class="result-enter bg-orange-100 border-2 border-orange-400 result-card p-6 mb-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-orange-600 result-icon"></i>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-orange-800 mb-4">ATTENZIONE</h3>
+                                <div class="text-base text-orange-700">
+                                    <div class="risk-point">
+                                        ${risk.message}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                riskResultsDiv.innerHTML += resultHtml;
+            });
         }
     </script>
 </body>
